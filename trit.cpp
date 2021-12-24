@@ -198,7 +198,7 @@ bool TritSet::ProxyTrit::operator==(Trit value) const{
 }
 
 bool TritSet::ProxyTrit::operator==(const TritSet::ProxyTrit & other) const{
-    if ((*this == TRUE) && (other == TRUE)){
+    if ((*this == TRUE) && (other  == TRUE)){
         return true;
     }else if((*this == FALSE) && (other == FALSE)){
         return true;
