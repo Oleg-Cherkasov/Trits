@@ -144,6 +144,10 @@ unsigned int TritSet::get_capacity() const {
     return this->capacity;
 }
 
+TritSet::~TritSet() {
+    delete(arr);
+}
+
 TritSet::ProxyTrit::ProxyTrit(TritSet* set, unsigned int index_, bool set_state) {
     trit_set = set;
     index = index_;

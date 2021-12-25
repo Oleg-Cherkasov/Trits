@@ -18,9 +18,7 @@ private:
     unsigned int capacity = 0;
     class ProxyTrit{
     private:
-        TritSet* trit_set
-
-        ;
+        TritSet* trit_set;
         unsigned int index;
         bool out_of_set;
     public:
@@ -41,6 +39,7 @@ private:
         Trit operator|(Trit value)   const;
     };
 public:
+    ~TritSet();
     std::unordered_map< Trit, int, std::hash<int> > cardinality();
     unsigned int get_capacity() const;
     unsigned get_length();
@@ -50,14 +49,14 @@ public:
     TritSet operator|(TritSet & set);
     TritSet operator~();
     void change_size(unsigned int new_capacity);
-    explicit TritSet(unsigned int trit_count);
+    TritSet(unsigned int trit_count);
     ProxyTrit operator[](unsigned int index);
     void shrink();
     class iterator{
     private:
         ProxyTrit proxy;
     public:
-        explicit iterator(ProxyTrit _proxy);
+        iterator(ProxyTrit _proxy);
         bool operator!=(iterator it);
         bool operator==(iterator it);
         bool operator!=(Trit value);
