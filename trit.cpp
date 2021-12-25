@@ -4,6 +4,7 @@
 #include "trit.h"
 #include <cmath>
 #include <algorithm>
+#include <iostream>
 
 TritSet::TritSet(unsigned int trit_count) {
     capacity = trit_count;
@@ -13,10 +14,10 @@ TritSet::TritSet(unsigned int trit_count) {
     std::fill(arr,arr+uint_count,0);
 }
 
-TritSet::ProxyTrit  TritSet::operator[](unsigned int index) {
+TritSet::ProxyTrit  TritSet::operator[](unsigned int index){
     if (index <= (this->capacity - 1)){
-            TritSet::ProxyTrit proxy(this, index, false);
-            return proxy;
+        TritSet::ProxyTrit proxy(this, index, false);
+        return proxy;
     }else{
         TritSet::ProxyTrit proxy(this, index, true);
         return proxy;
@@ -29,6 +30,11 @@ void TritSet::change_size(unsigned int new_capacity) {
     unsigned int new_uint_count = new_capacity*2/(8*sizeof(unsigned int));
     if (((new_capacity * 2) % (8 * sizeof(unsigned int))) != 0) new_uint_count++;
     if (new_uint_count != uint_count) {
+        unsigned int* check_arr = this->arr;
+        if (check_arr == nullptr){
+            std::cout << "pointer to nullptr";
+            exit(1);
+        }
         this->arr = (unsigned int *) realloc(this->arr, sizeof(unsigned int) * new_uint_count);
         if (new_uint_count > uint_count) {
             std::fill(this->arr + uint_count + 1, this->arr + new_uint_count, 0);
@@ -58,7 +64,7 @@ void TritSet::shrink() {
     this->change_size(last_valuable_index + 1);
 }
 
-TritSet TritSet::operator&(TritSet &other){
+TritSet TritSet::operator&(const TritSet &other){
     unsigned int new_capacity;
     if (this->capacity > other.capacity){
         new_capacity = this->capacity;
@@ -72,7 +78,7 @@ TritSet TritSet::operator&(TritSet &other){
     return new_set;
 }
 
-TritSet TritSet::operator|(TritSet &other) {
+TritSet TritSet::operator|(const TritSet &other){
     unsigned int new_capacity;
     if (this->capacity > other.capacity){
         new_capacity = this->capacity;
@@ -144,8 +150,47 @@ unsigned int TritSet::get_capacity() const {
     return this->capacity;
 }
 
+bool TritSet::operator==(const TritSet &set) const {
+    bool state;
+    for (int i = 0; i < this->capacity; i++){
+        if ((*this)[i] !=set[i] ){
+            state = TRUE;
+        }
+    }
+    return !state;
+}
+
+Trit TritSet::operator[](unsigned int index) const {
+    if (index >= capacity){
+        return UNKNOWN;
+    }else {
+        unsigned int uint_number = (index + 1) * 2 / (8 * sizeof(unsigned int));
+        if ((((index + 1) * 2) % (8 * sizeof(unsigned int))) != 0) uint_number++;
+        unsigned int trit_index = (index + 1) % ((uint_number) * sizeof(unsigned int) * 4);
+        unsigned int trit_value = TRUE;
+        trit_value = trit_value & (this->arr[uint_number - 1] >> (trit_index - 1) * 2);
+        if (trit_value == TRUE) {
+            return TRUE;
+        } else if (trit_value == FALSE) {
+            return FALSE;
+        } else return UNKNOWN;
+    }
+}
+
+TritSet TritSet::const_test(const TritSet &set) const {
+    TritSet new_set(this->capacity);
+    for (int i = 0; i < capacity; i++){
+        if ((*this)[i] == set[i]){
+            new_set[i] = set[i];
+        }else{
+            new_set[i] = UNKNOWN;
+        }
+    }
+    return new_set;
+}
+
 TritSet::~TritSet() {
-    delete(arr);
+    free(this->arr);
 }
 
 TritSet::ProxyTrit::ProxyTrit(TritSet* set, unsigned int index_, bool set_state) {
@@ -316,3 +361,4 @@ bool TritSet::iterator::operator!=(Trit value) {
 void TritSet::iterator::operator--() {
     this->proxy.setProxyIndex(this->proxy.getIndex()-1);
 }
+

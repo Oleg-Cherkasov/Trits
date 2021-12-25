@@ -23,7 +23,7 @@ private:
         bool out_of_set;
     public:
         void setProxyIndex(unsigned int _ind);
-        TritSet* getTritSet() {return trit_set;};
+        const TritSet* getTritSet()  {return trit_set;};
         unsigned int getIndex() const {return index;};
         ProxyTrit(TritSet* set, unsigned int index_, bool set_state);
         void operator=(Trit value);
@@ -40,13 +40,16 @@ private:
     };
 public:
     ~TritSet();
+    TritSet const_test(const TritSet & set)const;
+    Trit operator[](unsigned int index) const;
+    bool operator==(const TritSet & set) const;
     std::unordered_map< Trit, int, std::hash<int> > cardinality();
     unsigned int get_capacity() const;
     unsigned get_length();
     void trim(unsigned last_index);
     unsigned int cardinality(Trit value);
-    TritSet operator&(TritSet & set);
-    TritSet operator|(TritSet & set);
+    TritSet operator&(const TritSet & set);
+    TritSet operator|(const TritSet & set);
     TritSet operator~();
     void change_size(unsigned int new_capacity);
     TritSet(unsigned int trit_count);
@@ -63,6 +66,7 @@ public:
         bool operator==(Trit value);
         void operator++();
         void operator--();
+        ProxyTrit operator&(){return this->proxy;};
     };
     iterator begin();
     iterator end();

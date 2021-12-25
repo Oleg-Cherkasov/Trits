@@ -158,3 +158,30 @@ TEST(TritSetTest, MemoryTest){
     p[30] = p[10];
     ASSERT_EQ(p[30], TRUE);
 }
+
+TEST(iteratorTest, RangeBasedForTest){
+    TritSet a(100);
+    TritSet exp(100);
+    for (auto it = a.begin(); it != a.end(); it.operator++()){
+        &it = TRUE;
+    }
+    for (int i = 0; i < 100; i++){
+        exp[i] = TRUE;
+    }
+    ASSERT_EQ(a, exp);
+}
+
+TEST(ConstTritSetTest, eqTest){
+    TritSet a(5);
+    TritSet b(5);
+    a[1] = TRUE;
+    a[2] = FALSE;
+    a[4] = FALSE;
+    a[5] = FALSE;
+    b[1] = TRUE;
+    b[2] = FALSE;
+    b[4] = FALSE;
+    b[5] = FALSE;
+    TritSet c = a.const_test(b);
+    ASSERT_EQ(a,c);
+}
