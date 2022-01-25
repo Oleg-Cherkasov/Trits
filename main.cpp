@@ -1,9 +1,8 @@
 #include "trit.h"
-#include <iostream>
 #include <gtest/gtest.h>
 
 int main(int argc, char **argv) {
-    printf("Running main() from gtest_main.cc\n");
+   printf("Running main() from gtest_main.cc\n");
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

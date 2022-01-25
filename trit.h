@@ -40,19 +40,20 @@ private:
     };
 public:
     ~TritSet();
-    TritSet const_test(const TritSet & set)const;
+    TritSet(unsigned int trit_count);
+    TritSet(const TritSet &other);
     Trit operator[](unsigned int index) const;
     bool operator==(const TritSet & set) const;
+    TritSet operator&(const TritSet & set);
+    TritSet operator|(const TritSet & set);
+    TritSet operator~();
     std::unordered_map< Trit, int, std::hash<int> > cardinality();
     unsigned int get_capacity() const;
     unsigned get_length();
     void trim(unsigned last_index);
     unsigned int cardinality(Trit value);
-    TritSet operator&(const TritSet & set);
-    TritSet operator|(const TritSet & set);
-    TritSet operator~();
     void change_size(unsigned int new_capacity);
-    TritSet(unsigned int trit_count);
+
     ProxyTrit operator[](unsigned int index);
     void shrink();
     class iterator{
@@ -64,8 +65,10 @@ public:
         bool operator==(iterator it);
         bool operator!=(Trit value);
         bool operator==(Trit value);
+        iterator* operator*(){return this;};
+        void operator++(int);
         void operator++();
-        void operator--();
+        void operator--(int);
         ProxyTrit operator&(){return this->proxy;};
     };
     iterator begin();

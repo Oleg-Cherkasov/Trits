@@ -14,7 +14,7 @@ TritSet::TritSet(unsigned int trit_count) {
     std::fill(arr,arr+uint_count,0);
 }
 
-TritSet::ProxyTrit  TritSet::operator[](unsigned int index){
+TritSet::ProxyTrit TritSet::operator[](unsigned int index){
     if (index <= (this->capacity - 1)){
         TritSet::ProxyTrit proxy(this, index, false);
         return proxy;
@@ -30,12 +30,13 @@ void TritSet::change_size(unsigned int new_capacity) {
     unsigned int new_uint_count = new_capacity*2/(8*sizeof(unsigned int));
     if (((new_capacity * 2) % (8 * sizeof(unsigned int))) != 0) new_uint_count++;
     if (new_uint_count != uint_count) {
-        unsigned int* check_arr = this->arr;
-        if (check_arr == nullptr){
-            std::cout << "pointer to nullptr";
+        unsigned int* tmp_arr;
+        tmp_arr = (unsigned int *) realloc(this->arr, sizeof(unsigned int) * new_uint_count);
+        if (tmp_arr == nullptr){
+            std:: cout << "realloc failure";
             exit(1);
         }
-        this->arr = (unsigned int *) realloc(this->arr, sizeof(unsigned int) * new_uint_count);
+        this->arr = tmp_arr;
         if (new_uint_count > uint_count) {
             std::fill(this->arr + uint_count + 1, this->arr + new_uint_count, 0);
         }
@@ -56,7 +57,7 @@ TritSet::iterator TritSet::end() {
 void TritSet::shrink() {
     int last_valuable_index = 0;
     int i = 0;
-    for (iterator it = this->begin(); it != this->end(); it.operator++(), i++){
+    for (iterator it = this->begin(); it != this->end(); it++, i++){
         if (it != UNKNOWN){
             last_valuable_index = i;
         }
@@ -95,7 +96,7 @@ TritSet TritSet::operator|(const TritSet &other){
 TritSet TritSet::operator~() {
     TritSet new_set(this->capacity);
     int i = 0;
-    for (iterator it = new_set.begin(); it != new_set.end(); it.operator++(), i++){
+    for (iterator it = new_set.begin(); it != new_set.end(); it++, i++){
         new_set[i] = ~(*this)[i];
     }
     return new_set;
@@ -103,7 +104,7 @@ TritSet TritSet::operator~() {
 
 unsigned int TritSet::cardinality(Trit value) {
     int num = 0;
-    for (iterator it = this->begin(); it != this->end(); it.operator++()){
+    for (iterator it = this->begin(); it != this->end(); it++){
         if (it == value){
             num++;
         }
@@ -113,9 +114,10 @@ unsigned int TritSet::cardinality(Trit value) {
 
 void TritSet::trim(unsigned int last_index) {
     int i = 0;
-    for (iterator it = this->begin(); it != this->end(); it.operator++(), i++){
+    for (iterator it = this->begin(); it != this->end(); it++, i++){
         if (i >= last_index){
             (*this)[i] = UNKNOWN;
+            &it = TRUE;
         }
     }
 }
@@ -123,7 +125,7 @@ void TritSet::trim(unsigned int last_index) {
 unsigned TritSet::get_length() {
     unsigned int last_valuable_index = 0;
     int i = 0;
-    for (iterator it = this->begin(); it != this->end(); it.operator++(), i++){
+    for (iterator it = this->begin(); it != this->end(); it++, i++){
         if (it != UNKNOWN){
             last_valuable_index = i;
         }
@@ -134,7 +136,7 @@ unsigned TritSet::get_length() {
 std::unordered_map<Trit, int, std::hash<int>> TritSet::cardinality() {
     std::unordered_map<Trit, int, std::hash<int>> map;
     int i = 0;
-    for (iterator it = this->begin(); it != this->end(); it.operator++(), i++){
+    for (iterator it = this->begin(); it != this->end(); it++, i++){
         if ((*this)[i] == TRUE){
             map[TRUE]++;
         }else if((*this)[i] == FALSE){
@@ -177,20 +179,20 @@ Trit TritSet::operator[](unsigned int index) const {
     }
 }
 
-TritSet TritSet::const_test(const TritSet &set) const {
-    TritSet new_set(this->capacity);
-    for (int i = 0; i < capacity; i++){
-        if ((*this)[i] == set[i]){
-            new_set[i] = set[i];
-        }else{
-            new_set[i] = UNKNOWN;
-        }
-    }
-    return new_set;
-}
 
 TritSet::~TritSet() {
     free(this->arr);
+}
+
+TritSet::TritSet(const TritSet &other) {
+    unsigned int* tmp_arr;
+    this->capacity = other.capacity;
+    unsigned int new_cap = ceil(double(other.capacity)*2/8);
+    tmp_arr = (unsigned int *) malloc(sizeof(int) * new_cap);
+    this->arr = tmp_arr;
+    for (int i = 0; i < other.capacity; i++){
+        (*this)[i] = other[i];
+    }
 }
 
 TritSet::ProxyTrit::ProxyTrit(TritSet* set, unsigned int index_, bool set_state) {
@@ -281,6 +283,7 @@ Trit TritSet::ProxyTrit::operator&(const ProxyTrit & other) const {
     }else if ((*this == UNKNOWN) || (other == UNKNOWN)){
         return UNKNOWN;
     }else return TRUE;
+
 }
 
 bool TritSet::ProxyTrit::operator!=(Trit value) const{
@@ -338,7 +341,7 @@ bool TritSet::iterator::operator!=(TritSet::iterator it) {
     }
 }
 
-void TritSet::iterator::operator++() {
+void TritSet::iterator::operator++(int) {
     this->proxy.setProxyIndex(this->proxy.getIndex()+1);
 }
 
@@ -358,7 +361,11 @@ bool TritSet::iterator::operator!=(Trit value) {
     return !(this->proxy == value);
 }
 
-void TritSet::iterator::operator--() {
+void TritSet::iterator::operator--(int) {
     this->proxy.setProxyIndex(this->proxy.getIndex()-1);
+}
+
+void TritSet::iterator::operator++() {
+    this->proxy.setProxyIndex(this->proxy.getIndex()+1);
 }
 

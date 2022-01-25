@@ -108,12 +108,12 @@ TEST(TritSetTest, OperatorTest_or){
     second[17] = TRUE;
     second[20] = FALSE;
     second[49] = FALSE;
-    second[59] = TRUE;
+    second[58] = TRUE;
     expect[0] = TRUE;
     expect[17] = TRUE;
     expect[20] = FALSE;
     expect[49] = UNKNOWN;
-    expect[59] = TRUE;
+    expect[58] = TRUE;
     TritSet result = first | second;
 
     ASSERT_EQ(result.get_capacity(), 60);
@@ -162,9 +162,11 @@ TEST(TritSetTest, MemoryTest){
 TEST(iteratorTest, RangeBasedForTest){
     TritSet a(100);
     TritSet exp(100);
-    for (auto it = a.begin(); it != a.end(); it.operator++()){
-        &it = TRUE;
+
+    for (auto  it : a){
+        &(*it) = TRUE;
     }
+
     for (int i = 0; i < 100; i++){
         exp[i] = TRUE;
     }
@@ -173,15 +175,11 @@ TEST(iteratorTest, RangeBasedForTest){
 
 TEST(ConstTritSetTest, eqTest){
     TritSet a(5);
-    TritSet b(5);
     a[1] = TRUE;
     a[2] = FALSE;
     a[4] = FALSE;
     a[5] = FALSE;
-    b[1] = TRUE;
-    b[2] = FALSE;
-    b[4] = FALSE;
-    b[5] = FALSE;
-    TritSet c = a.const_test(b);
-    ASSERT_EQ(a,c);
+    const TritSet b(a);
+    ASSERT_EQ(a,b);
 }
+
